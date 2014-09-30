@@ -2,7 +2,7 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import play.api.libs.json.
+import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import models.Task
 import play.api.data._
@@ -10,7 +10,7 @@ import play.api.data.Forms._
 
 object Application extends Controller {
 
-  implicit val taskWrites: Wiretes[Task] = (
+  implicit val taskWrites: Writes[Task] = (
     (JsPath \ "id").write[Long] and
     (JsPath \ "label").write[String]
   )(unlift(Task.unapply))
@@ -24,7 +24,7 @@ object Application extends Controller {
   }
 
   def tasks = Action {
-    val json = Json.toJson(Task.list)
+    val json = Json.toJson(Task.all())
     Ok(json)
   }
 
