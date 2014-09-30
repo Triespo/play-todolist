@@ -28,9 +28,13 @@ object Application extends Controller {
     Ok(json)
   }
 
-  def consultTask(id: Long) = Action { implicit request =>
-    val json = Json.toJson(Task.consult(id))
-    Ok(json)
+  def consultTask(id: Long) = Action { 
+    try{
+      val json = Json.toJson(Task.consult(id))
+      Ok(json)
+    }catch{
+      case e: Exception => NotFound("Error")   
+    }
   }
 
   def newTask = Action { implicit request =>
@@ -38,14 +42,17 @@ object Application extends Controller {
      errors => BadRequest(views.html.index(Task.all(), errors)),
      label => {
        Task.create(label)
-       Redirect(routes.Application.tasks)
+       Created(Json.toJson(label))
      }
    )
   }
 
   def deleteTask(id: Long) = Action {
-    Task.delete(id)
-    Redirect(routes.Application.tasks)
+
+    if(Task.delete(id) > 0)
+      Ok("Deleted")
+    else 
+      NotFound("Error")
   }
 
 }
