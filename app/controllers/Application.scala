@@ -2,24 +2,30 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.libs.json.
+import play.api.libs.functional.syntax._
 import models.Task
 import play.api.data._
 import play.api.data.Forms._
 
 object Application extends Controller {
 
-  
+  implicit val taskWrites: Wiretes[Task] = (
+    (JsPath \ "id").write[Long] and
+    (JsPath \ "label").write[String]
+  )(unlift(Task.unapply))
 
   val taskForm = Form(
   "label" -> nonEmptyText
   )
 
   def index = Action {
-    Redirect(routes.Application.tasks)
+    Ok(views.html.index(Task.all(), taskForm))
   }
 
   def tasks = Action {
-    Ok(views.html.index(Task.all(), taskForm))
+    val json = Json.toJson(Task.list)
+    Ok(json)
   }
 
   def newTask = Action { implicit request =>
