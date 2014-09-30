@@ -28,6 +28,11 @@ object Application extends Controller {
     Ok(json)
   }
 
+  def consultTask(id: Long) = Action { implicit request =>
+    val json = Json.toJson(Task.consultTask(id))
+    Ok(json)
+  }
+
   def newTask = Action { implicit request =>
    taskForm.bindFromRequest.fold(
      errors => BadRequest(views.html.index(Task.all(), errors)),
