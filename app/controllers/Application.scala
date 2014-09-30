@@ -29,7 +29,7 @@ object Application extends Controller {
   }
 
   def consultTask(id: Long) = Action { implicit request =>
-    val json = Json.toJson(Task.consultTask(id))
+    val json = Json.toJson(Task.consult(id))
     Ok(json)
   }
 
