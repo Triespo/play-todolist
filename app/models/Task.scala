@@ -19,6 +19,10 @@ object Task {
   def all(): List[Task] = DB.withConnection { implicit c =>
     SQL("select * from task").as(task *)
   }
+
+  def consult(id: Long): Task = DB.withConnection { implicit c =>
+    SQL("select * from task where id = {id}").on('id -> id).as(task.single)
+  } 
   
   def create(label: String) {
     DB.withConnection { implicit c =>
@@ -28,11 +32,13 @@ object Task {
     }
   }
 
-  def delete(id: Long) {
-    DB.withConnection { implicit c =>
+  def delete(id: Long):Int = {
+      val value:Int = DB.withConnection { 
+      implicit c =>
       SQL("delete from task where id = {id}").on(
         'id -> id
       ).executeUpdate()
     }
+    value
   }
 }
