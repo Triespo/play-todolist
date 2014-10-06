@@ -55,4 +55,21 @@ object Application extends Controller {
       NotFound("Error")
   }
 
+   def userTasks(user: String) = Action {
+      if(User.FindUser(user)){
+        val json = Json.toJson(User.all())
+        Ok(json)
+      }
+      else
+        NotFound("User not found")
+   }
+
+   def addTask(user:String) = Action { implicit request =>
+      taskForm.bindFromRequest.fold(
+        label => {
+          User.create(user, label)
+          Created(Json.toJson(label))
+        }
+      )
+   }
 }
