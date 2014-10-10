@@ -17,7 +17,7 @@ object Task {
   }
 
   def all(): List[Task] = DB.withConnection { implicit c =>
-    SQL("select * from task").as(task *)
+    SQL("select * from task where user = 'anonimo'").as(task *)
   }
 
   def consult(id: Long): Task = DB.withConnection { implicit c =>
@@ -26,7 +26,7 @@ object Task {
   
   def create(label: String) {
     DB.withConnection { implicit c =>
-      SQL("insert into task (label) values ({label})").on(
+      SQL("update task set (label) values ({label}) where user = 'anonimo'").on(
         'label -> label
       ).executeUpdate()
     }
