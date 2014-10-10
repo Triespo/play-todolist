@@ -26,5 +26,9 @@ object User{
       ).executeUpdate()
    }
 
+   def all(user: String): List[Task] = DB.withConnection { implicit c =>
+    SQL("select * from task where user = {user}").on('user -> user).as(Task.task *)
+   }
+
    //ef all(user: String): List[Task]
 }
