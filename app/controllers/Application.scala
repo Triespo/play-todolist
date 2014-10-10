@@ -56,8 +56,11 @@ object Application extends Controller {
   }
 
    def userTasks(user: String) = Action {
-      if(User.FindUser(user)){
-        val json = Json.toJson(User.all())
+      
+      val encontrado: Option[Int] = User.FindUser(user)
+
+      if(encontrado.getOrElse(-1)==-1){
+        val json = Json.toJson(User.all(user: String))
         Ok(json)
       }
       else

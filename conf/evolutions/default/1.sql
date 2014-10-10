@@ -8,3 +8,8 @@ CREATE TABLE task (
     label varchar(255)
     user varchar(25)
 );
+
+# --- !Downs
+
+DROP TABLE task;
+DROP SEQUENCE task_id_seq;

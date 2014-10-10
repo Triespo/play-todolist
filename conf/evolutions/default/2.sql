@@ -2,9 +2,9 @@
 # ADD task_user
  
 # --- !Ups
-
 CREATE TABLE task_user (
-   login varchar(25) NOT NULL DEFAULT 'anonimo'
+   login varchar(25) NOT NULL DEFAULT 'anonimo',
+   #UNIQUE (login)
 );
 
 alter table task add constraint fk_task_taskUser foreign key 
@@ -12,6 +12,4 @@ alter table task add constraint fk_task_taskUser foreign key
 
 # --- !Downs
 
-DROP TABLE task;
-DROP SEQUENCE task_id_seq;
 DROP TABLE task_user;
