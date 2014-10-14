@@ -11,12 +11,18 @@ import play.api.data.Forms._
 object Application extends Controller {
 
   implicit val taskWrites: Writes[Task] = (
-    (JsPath \ "id").write[Long] and
-    (JsPath \ "label").write[String]
+    (JsPath \ "id").write[Int] and
+    (JsPath \ "label").write[String] and
+    (JsPath \ "user_name").write[String]
   )(unlift(Task.unapply))
 
+  /**implicit val userWrites: Writes[User] = (
+    (JsPath \ "id").write[Long] and
+    (JsPath \ "login").write[String]
+  )(unlift(User.unapply))**/
+
   val taskForm = Form(
-  "label" -> nonEmptyText
+    "label" -> nonEmptyText
   )
 
   def index = Action {
@@ -28,7 +34,7 @@ object Application extends Controller {
     Ok(json)
   }
 
-  def consultTask(id: Long) = Action { 
+  def consultTask(id: Int) = Action { 
     try{
       val json = Json.toJson(Task.consult(id))
       Ok(json)
@@ -47,7 +53,7 @@ object Application extends Controller {
    )
   }
 
-  def deleteTask(id: Long) = Action {
+  def deleteTask(id: Int) = Action {
 
     if(Task.delete(id) > 0)
       Ok("Deleted")
@@ -57,21 +63,33 @@ object Application extends Controller {
 
    def userTasks(user: String) = Action {
       
-      val encontrado: Option[Int] = User.FindUser(user)
+      val encontrado = Task.findUser(user)
 
-      if(encontrado.getOrElse(-1)==-1){
-        val json = Json.toJson(User.all(user: String))
-        Ok(json)
+      if(encontrado != None){
+        if(encontrado.getOrElse(user) == user){
+          val json = Json.toJson(Task.all(user))
+          Ok(json)
+        }
+        else
+          NotFound("User not exist")
       }
       else
         NotFound("User not found")
    }
 
-   def addTask(user:String) = Action { implicit request =>
+   def addTask(userName: String) = Action { implicit request =>
       taskForm.bindFromRequest.fold(
+        errors => BadRequest(views.html.index(Task.all(), errors)),
         label => {
-          User.create(user, label)
-          Created(Json.toJson(label))
+          val userFound = Task.findUser(userName)
+          if(userFound != None){
+            //if(encontrado.getOrElse(user) == encontrado){
+              Task.createInUser(userName, label)
+              Created(Json.toJson(label))
+            //}
+          }
+          else 
+            NotFound("No")
         }
       )
    }

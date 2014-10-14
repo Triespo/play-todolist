@@ -7,7 +7,7 @@ GET     /                           controllers.Application.index
 
 # Consultar una tarea
 
-GET     /tasks/:id              controllers.Application.consultTask(id: Long)
+GET     /tasks/:id              controllers.Application.consultTask(id: Int)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
@@ -20,4 +20,4 @@ GET      /:user/tasks            controllers.Application.userTasks(user: String)
 POST     /:user/tasks            controllers.Application.addTask(user: String)
 
 # Borrar una tarea
-DELETE   /tasks/:id              controllers.Application.deleteTask(id: Long)
+DELETE   /tasks/:id              controllers.Application.deleteTask(id: Int)

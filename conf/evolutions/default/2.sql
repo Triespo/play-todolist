@@ -2,17 +2,18 @@
 # ADD task_user
  
 # --- !Ups
-CREATE SEQUENCE task_user_id_seq;
 
 CREATE TABLE task_user (
-   id Integer NOT NULL DEFAULT nextval(task_user_id_seq)
-   login varchar(25) NOT NULL DEFAULT 'anonimo',
-   #UNIQUE (login)
+   login varchar(25) NOT NULL
 );
 
-alter table task add constraint fk_task_taskUser foreign key 
-(user) references task_user (login) on delete restrict on update restrict;
+ALTER TABLE task ADD CONSTRAINT fk_task_taskUser FOREIGN KEY (user_name) REFERENCES task_user (login);
+
+INSERT INTO task_user VALUES ('anonimo');
+INSERT INTO task_user VALUES ('miguel');
+INSERT INTO task_user VALUES ('pepe');
+UPDATE task set label='leche' where user_name='miguel';
 
 # --- !Downs
-DROP SEQUENCE task_user_id_seq;
+
 DROP TABLE task_user;
