@@ -5,22 +5,23 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
-case class Task(id: Long, label: String)
+case class Task(id: Int, label: String, user_name: String)
 
 object Task {
   
   val task = {
-    get[Long]("id") ~ 
-    get[String]("label") map {
-     case id~label => Task(id, label)
+    get[Int]("id") ~ 
+    get[String]("label") ~
+    get[String]("user_name") map {
+     case id~label~user_name => Task(id, label, user_name)
     }
   }
 
   def all(): List[Task] = DB.withConnection { implicit c =>
-    SQL("select * from task").as(task *)
+    SQL("select * from task where user_name = 'anonimo'").as(task *)
   }
 
-  def consult(id: Long): Task = DB.withConnection { implicit c =>
+  def consult(id: Int): Task = DB.withConnection { implicit c =>
     SQL("select * from task where id = {id}").on('id -> id).as(task.single)
   } 
   
@@ -32,13 +33,29 @@ object Task {
     }
   }
 
-  def delete(id: Long):Int = {
-      val value:Int = DB.withConnection { 
-      implicit c =>
-      SQL("delete from task where id = {id}").on(
-        'id -> id
-      ).executeUpdate()
+  def delete(id: Int):Int = {
+    val value:Int = DB.withConnection { 
+    implicit c =>
+    SQL("delete from task where id = {id}").on(
+      'id -> id
+    ).executeUpdate()
     }
     value
+  }
+
+  def findUser(login: String): Option[String] = DB.withConnection { implicit c =>
+    SQL("select login from task_user where login = {login}").on('login -> login).as(scalar[String].singleOpt)
+  } 
+
+  def createInUser(user_name: String, label: String){
+    DB.withConnection { implicit c =>
+      SQL("insert into task (label,user_name) values ({label},{user_name})").on(
+        'label -> label, 'user_name -> user_name
+      ).executeUpdate()
+    }
+  }
+
+  def all(user_name: String): List[Task] = DB.withConnection { implicit c =>
+    SQL("select * from task where user_name = {user_name}").on('user_name -> user_name).as(task *)
   }
 }

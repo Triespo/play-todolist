@@ -11,12 +11,13 @@ import play.api.data.Forms._
 object Application extends Controller {
 
   implicit val taskWrites: Writes[Task] = (
-    (JsPath \ "id").write[Long] and
-    (JsPath \ "label").write[String]
+    (JsPath \ "id").write[Int] and
+    (JsPath \ "label").write[String] and
+    (JsPath \ "user_name").write[String]
   )(unlift(Task.unapply))
 
   val taskForm = Form(
-  "label" -> nonEmptyText
+    "label" -> nonEmptyText
   )
 
   def index = Action {
@@ -28,12 +29,12 @@ object Application extends Controller {
     Ok(json)
   }
 
-  def consultTask(id: Long) = Action { 
+  def consultTask(id: Int) = Action { 
     try{
       val json = Json.toJson(Task.consult(id))
       Ok(json)
     }catch{
-      case e: Exception => NotFound("Error")   
+      case e: Exception => NotFound("Error al consultar")   
     }
   }
 
@@ -47,12 +48,42 @@ object Application extends Controller {
    )
   }
 
-  def deleteTask(id: Long) = Action {
+  def deleteTask(id: Int) = Action {
 
     if(Task.delete(id) > 0)
-      Ok("Deleted")
+      Ok("Borrado")
     else 
-      NotFound("Error")
+      NotFound("Error al borrar")
   }
 
+   def userTasks(user: String) = Action {
+      
+      val encontrado = Task.findUser(user)
+
+      if(encontrado != None){
+        if(encontrado.getOrElse(user) == user){
+          val json = Json.toJson(Task.all(user))
+          Ok(json)
+        }
+        else
+          NotFound("Usuario no existe")
+      }
+      else
+        NotFound("Usuario no encontrado")
+   }
+
+   def addTask(userName: String) = Action { implicit request =>
+      taskForm.bindFromRequest.fold(
+        errors => BadRequest(views.html.index(Task.all(), errors)),
+        label => {
+          val userFound = Task.findUser(userName)
+          if(userFound != None){
+              Task.createInUser(userName, label)
+              Created(Json.toJson(label))
+          }
+          else 
+            NotFound("No podemos insertar tarea debido que no existe")
+        }
+      )
+   }
 }

@@ -7,8 +7,10 @@ CREATE TABLE task (
     id integer NOT NULL DEFAULT nextval('task_id_seq'),
     label varchar(255)
 );
- 
+
+ALTER TABLE task ADD user_name varchar(25) DEFAULT 'anonimo'
+
 # --- !Downs
- 
+
 DROP TABLE task;
 DROP SEQUENCE task_id_seq;
