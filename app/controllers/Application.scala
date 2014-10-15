@@ -67,43 +67,44 @@ object Application extends Controller {
       NotFound("Error al borrar")
   }
 
-   def userTasks(user: String) = Action {
+  def userTasks(user: String) = Action {
       
-      val encontrado = Task.findUser(user)
+    val encontrado = Task.findUser(user)
 
-      if(encontrado != None){
-        if(encontrado.getOrElse(user) == user){
-          val json = Json.toJson(Task.all(user))
-          Ok(json)
-        }
-        else
-          NotFound("Usuario no existe")
+    if(encontrado != None){
+      if(encontrado.getOrElse(user) == user){
+        val json = Json.toJson(Task.all(user))
+        Ok(json)
       }
       else
-        NotFound("Usuario no encontrado")
-   }
+        NotFound("Usuario no existe")
+    }
+    else
+      NotFound("Usuario no encontrado")
+  }
 
-   def addTask(userName: String) = Action { implicit request =>
-      taskForm.bindFromRequest.fold(
-        errors => BadRequest(views.html.index(Task.all(), errors)),
-        label => {
-          val userFound = Task.findUser(userName)
-          if(userFound != None){
-              Task.createInUser(userName, label)
-              Created(Json.toJson(label))
-          }
-          else 
-            NotFound("No podemos insertar tarea debido que no existe")
+  def addTask(userName: String) = Action { implicit request =>
+    taskForm.bindFromRequest.fold(
+      errors => BadRequest(views.html.index(Task.all(), errors)),
+      label => {
+        val userFound = Task.findUser(userName)
+        if(userFound != None){
+            Task.createInUser(userName, label)
+            Created(Json.toJson(label))
         }
-      )
-   }
+        else 
+          NotFound("No podemos insertar tarea debido que no existe")
+      }
+    )
+  }
 
-   def getFecha(id: Int) = Action {
+  def getFecha(id: Int) = Action {
 
-    val tarea = Task.findTarea(id)  
-    if(tarea != None)
-    {
+    val tarea = Task.findTarea(id)
+
+    if(tarea != None){
       val fecha = Task.obtFecha(id)
+
       if(fecha != None){
         val json = Json.toJson(formato.format(fecha.getOrElse(fecha)))
         Ok(json)
@@ -113,4 +114,20 @@ object Application extends Controller {
     }
     else
       NotFound("La tarea no existe")
+  }
+
+  def addFecha(id: Int, date: String) {
+
+    val tarea = Task.findTarea(id)
+
+    if(tarea != None){
+      val fecha:Date = formato.parse(date)
+      val nFecha = Task.createFecha(id,fecha)
+
+      val json = Json.toJson(formato.format(nFecha.getOrElse("")))
+      Ok(json)
+    }
+    else
+      NotFound("No podemos guardar fecha, tarea no existe")
+  }
 }
