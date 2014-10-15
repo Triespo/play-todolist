@@ -13,13 +13,13 @@ import java.text.SimpleDateFormat
 
 object Application extends Controller {
 
-   val formato = new SimpleDateFormat("yyyy/MM/dd")
+   val formato = new SimpleDateFormat("yyyy-MM-dd")
 
   implicit val taskWrites: Writes[Task] = (
     (JsPath \ "id").write[Int] and
     (JsPath \ "label").write[String] and
     (JsPath \ "user_name").write[String] and
-    (JsPath \ "task_date".write[String].contramap[Option[Date]](data =>
+    (JsPath \ "task_date").write[String].contramap[Option[Date]](data =>
       if(data != None)
         formato.format(data.getOrElse(data))
       else
@@ -93,7 +93,7 @@ object Application extends Controller {
             Created(Json.toJson(label))
         }
         else 
-          NotFound("No podemos insertar tarea debido que no existe")
+          NotFound("No podemos insertar tarea debido que no existe el Usuario")
       }
     )
   }
@@ -116,16 +116,15 @@ object Application extends Controller {
       NotFound("La tarea no existe")
   }
 
-  def addFecha(id: Int, date: String) {
+  def addFecha(id: Int, date: String) = Action{
 
     val tarea = Task.findTarea(id)
 
     if(tarea != None){
       val fecha:Date = formato.parse(date)
-      val nFecha = Task.createFecha(id,fecha)
-      if(nFecha != None){
-        val json = Json.toJson(formato.format(nFecha.getOrElse("")))
-        Ok(json)
+
+      if(Task.createFecha(id,fecha) > 0){
+        Ok("La fecha ha sido modificada")
       }
       else
         NotFound("No hemos guardado bien la fecha") 
