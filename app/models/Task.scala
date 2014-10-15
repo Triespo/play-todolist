@@ -4,6 +4,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
+import java.util.Date
 
 case class Task(id: Int, label: String, user_name: String)
 
@@ -12,8 +13,9 @@ object Task {
   val task = {
     get[Int]("id") ~ 
     get[String]("label") ~
-    get[String]("user_name") map {
-     case id~label~user_name => Task(id, label, user_name)
+    get[String]("user_name") ~
+    get[Option[Date]]("task_date") map {
+     case id~label~user_name~task_date => Task(id, label, user_name,task_date)
     }
   }
 
@@ -61,5 +63,9 @@ object Task {
 
   def all(user_name: String): List[Task] = DB.withConnection { implicit c =>
     SQL("select * from task where user_name = {user_name}").on('user_name -> user_name).as(task *)
+  }
+
+  def obtFecha(id: Int): Option[Date] = DB.withConnection { implicit c =>
+    SQL("select task_date from task where id={id}").on('id -> id).as(scalar[Date].singleOpt)
   }
 }
