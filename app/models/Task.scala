@@ -24,6 +24,10 @@ object Task {
   def consult(id: Int): Task = DB.withConnection { implicit c =>
     SQL("select * from task where id = {id}").on('id -> id).as(task.single)
   } 
+
+  def findTarea(id: Int): Option[String] = DB.withConnection { implicit c =>
+    SQL("select id, label from task where id = {id}").on('id -> id').as(scalar[String].singleOpt)
+  }
   
   def create(label: String) {
     DB.withConnection { implicit c =>

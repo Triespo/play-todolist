@@ -21,8 +21,8 @@ POST     /:user/tasks            controllers.Application.addTask(user: String)
 
 # Asignar fechas tareas
 
-GET      /tasks/:id/date        controllers.Application.getDate(id: Int)
-POST     /tasks/:id/:date       controllers.Application.addDate(id: Int, date: String)      
+GET      /tasks/:id/date        controllers.Application.getFecha(id: Int)
+POST     /tasks/:id/:date       controllers.Application.addFecha(id: Int, date: String)      
 
 # Borrar una tarea
 DELETE   /tasks/:id              controllers.Application.deleteTask(id: Int)

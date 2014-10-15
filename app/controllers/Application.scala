@@ -97,4 +97,20 @@ object Application extends Controller {
         }
       )
    }
+
+   def getFecha(id: Int) = Action {
+
+    val tarea = Task.findTarea(id)  
+    if(tarea != None)
+    {
+      val fecha = Task.obtFecha(id)
+      if(fecha != None){
+        val json = Json.toJson(formato.format(fecha.getOrElse(fecha)))
+        Ok(json)
+      }
+      else
+        NotFound("Fecha no encontrada")
+    }
+    else
+      NotFound("La tarea no existe")
 }
