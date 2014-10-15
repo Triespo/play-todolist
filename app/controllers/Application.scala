@@ -7,13 +7,24 @@ import play.api.libs.functional.syntax._
 import models.Task
 import play.api.data._
 import play.api.data.Forms._
+import java.util.Date
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 
 object Application extends Controller {
+
+   val formato = new SimpleDateFormat("yyyy/MM/dd")
 
   implicit val taskWrites: Writes[Task] = (
     (JsPath \ "id").write[Int] and
     (JsPath \ "label").write[String] and
-    (JsPath \ "user_name").write[String]
+    (JsPath \ "user_name").write[String] and
+    (JsPath \ "task_date".write[String].contramap[Option[Date]](data =>
+      if(data != None)
+        formato.format(data.getOrElse(data))
+      else
+        "NoData"
+    )
   )(unlift(Task.unapply))
 
   val taskForm = Form(
