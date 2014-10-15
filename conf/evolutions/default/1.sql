@@ -17,5 +17,7 @@ ALTER TABLE task ADD CONSTRAINT fk_task_taskUser FOREIGN KEY (user_name) REFEREN
 
 # --- !Downs
 
-DROP TABLE task;
+ALTER TABLE task DROP user_name;
+DROP TABLE IF EXISTS task_user;
+DROP TABLE IF EXISTS task;
 DROP SEQUENCE task_id_seq;
