@@ -16,11 +16,6 @@ object Application extends Controller {
     (JsPath \ "user_name").write[String]
   )(unlift(Task.unapply))
 
-  /**implicit val userWrites: Writes[User] = (
-    (JsPath \ "id").write[Long] and
-    (JsPath \ "login").write[String]
-  )(unlift(User.unapply))**/
-
   val taskForm = Form(
     "label" -> nonEmptyText
   )
@@ -39,7 +34,7 @@ object Application extends Controller {
       val json = Json.toJson(Task.consult(id))
       Ok(json)
     }catch{
-      case e: Exception => NotFound("Error")   
+      case e: Exception => NotFound("Error al consultar")   
     }
   }
 
@@ -56,9 +51,9 @@ object Application extends Controller {
   def deleteTask(id: Int) = Action {
 
     if(Task.delete(id) > 0)
-      Ok("Deleted")
+      Ok("Borrado")
     else 
-      NotFound("Error")
+      NotFound("Error al borrar")
   }
 
    def userTasks(user: String) = Action {
@@ -71,10 +66,10 @@ object Application extends Controller {
           Ok(json)
         }
         else
-          NotFound("User not exist")
+          NotFound("Usuario no existe")
       }
       else
-        NotFound("User not found")
+        NotFound("Usuario no encontrado")
    }
 
    def addTask(userName: String) = Action { implicit request =>
@@ -83,13 +78,11 @@ object Application extends Controller {
         label => {
           val userFound = Task.findUser(userName)
           if(userFound != None){
-            //if(encontrado.getOrElse(user) == encontrado){
               Task.createInUser(userName, label)
               Created(Json.toJson(label))
-            //}
           }
           else 
-            NotFound("No")
+            NotFound("No podemos insertar tarea debido que no existe")
         }
       )
    }

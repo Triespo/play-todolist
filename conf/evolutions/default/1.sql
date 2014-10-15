@@ -5,9 +5,10 @@
 CREATE SEQUENCE task_id_seq;
 CREATE TABLE task (
     id integer NOT NULL DEFAULT nextval('task_id_seq'),
-    label varchar(255),
-    user_name varchar(25) DEFAULT 'anonimo'
+    label varchar(255)
 );
+
+ALTER TABLE task ADD user_name varchar(25) DEFAULT 'anonimo'
 
 # --- !Downs
 

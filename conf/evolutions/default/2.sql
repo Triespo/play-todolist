@@ -12,7 +12,6 @@ ALTER TABLE task ADD CONSTRAINT fk_task_taskUser FOREIGN KEY (user_name) REFEREN
 INSERT INTO task_user VALUES ('anonimo');
 INSERT INTO task_user VALUES ('miguel');
 INSERT INTO task_user VALUES ('pepe');
-UPDATE task set label='leche' where user_name='miguel';
 
 # --- !Downs
 
