@@ -68,4 +68,8 @@ object Task {
   def obtFecha(id: Int): Option[Date] = DB.withConnection { implicit c =>
     SQL("select task_date from task where id={id}").on('id -> id).as(scalar[Date].singleOpt)
   }
+
+  def createFecha(id: Int, fecha: Date): Option[Date] = DB.withConnection { implicit c =>
+    SQL("update task set task_date={fecha} where id={id}").on('fecha -> fecha, 'id -> id).as(scalar[Date].singleOpt)
+  }
 }

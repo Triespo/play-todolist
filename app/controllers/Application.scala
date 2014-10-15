@@ -123,9 +123,12 @@ object Application extends Controller {
     if(tarea != None){
       val fecha:Date = formato.parse(date)
       val nFecha = Task.createFecha(id,fecha)
-
-      val json = Json.toJson(formato.format(nFecha.getOrElse("")))
-      Ok(json)
+      if(nFecha != None){
+        val json = Json.toJson(formato.format(nFecha.getOrElse("")))
+        Ok(json)
+      }
+      else
+        NotFound("No hemos guardado bien la fecha") 
     }
     else
       NotFound("No podemos guardar fecha, tarea no existe")
