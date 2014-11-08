@@ -46,10 +46,27 @@ class ApplicationSpec extends Specification {
         val result = controllers.Application.consultTask(1)(FakeRequest())
 
         status(result) must equalTo(OK)
-        contentAsString(result) must contain("""{"id":1,"label":"Goma","user_name":"anonimo","task_date":"NoData"}""")
+        contentAsString(result) must contain("""{"id":1,"label":"Goma","user_name":"anonimo","""
+          +""""task_date":"NoData"}""")
       }
     }
+    "listar tareas" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        val tarea1 = controllers.Application.addTask("anonimo")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "1", "label" -> "Goma"))
+        val tarea2 = controllers.Application.addTask("anonimo")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "2", "label" -> "Pan"))
+        val tarea3 = controllers.Application.addTask("anonimo")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "3", "label" -> "Leche"))
+        val result = controllers.Application.tasks(FakeRequest())
 
+        status(result) must equalTo(OK)
+        contentAsString(result) must contain("""[{"id":1,"label":"Goma","user_name":"anonimo","""
+          +""""task_date":"NoData"},{"id":2,"label":"Pan","user_name":"anonimo","""
+          +""""task_date":"NoData"},{"id":3,"label":"Leche","user_name":"anonimo","""
+          +""""task_date":"NoData"}]""")
+      }      
+    }
   }   
 }
 
