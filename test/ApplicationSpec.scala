@@ -1,30 +1,42 @@
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
+package test
 
-import play.api.test._
+import org.specs2.mutable._
+
+import play.api.test._  
 import play.api.test.Helpers._
 
-/**
- * Add your spec here.
- * You can mock out a whole application including requests, plugins etc.
- * For more information, consult the wiki.
- */
-@RunWith(classOf[JUnitRunner])
 class ApplicationSpec extends Specification {
 
   "Application" should {
 
-    "send 404 on a bad request" in new WithApplication{
-      route(FakeRequest(GET, "/boum")) must beNone
+    "send 404 on a bad request" in {  
+      running(FakeApplication()) {  
+        route(FakeRequest(GET, "/boum")) must beNone  
+      }
     }
 
-    "render the index page" in new WithApplication{
-      val home = route(FakeRequest(GET, "/")).get
+    "render the index page" in {  
+      running(FakeApplication()) {
 
-      status(home) must equalTo(OK)
-      contentType(home) must beSome.which(_ == "text/html")
-      contentAsString(home) must contain ("Your new application is ready.")
+        val Some(home) = route(FakeRequest(GET, "/tasks/login"))
+
+        status(home) must equalTo(OK)  
+        contentType(home) must beSome.which(_ == "text/html")  
+        contentAsString(home) must contain ("Login")  
+      }
     }
-  }
+
+    "process correct login" in {  
+      running(FakeApplication()) {
+
+        val Some(result) = route(  
+          FakeRequest(POST, "/tasks/login").withFormUrlEncodedBody(("email","pepito@gmail.com"),("password","1234"))  
+          )
+
+        status(result) must equalTo(SEE_OTHER)  
+        redirectLocation(result) must equalTo(Some("/tasks"))  
+        session(result).apply("email") must equalTo("pepito@gmail.com")  
+      }      
+    }  
+  }   
 }
