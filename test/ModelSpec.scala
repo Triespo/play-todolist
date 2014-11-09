@@ -65,5 +65,15 @@ class ModelSpec extends Specification {
                 delete must equalTo(1) //si >0 es que lo ha borrado
             }
         }
+        "crear tarea usuario modelo" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                Task.createInUser("pepe","agua")
+                val todos = Task.all("pepe")
+                val task1 = todos.head
+
+                task1.label must equalTo("agua")
+            }
+        }
     }  
 }
