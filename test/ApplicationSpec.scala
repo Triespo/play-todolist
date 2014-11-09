@@ -8,6 +8,8 @@ import play.api.test.Helpers._
 
 class ApplicationSpec extends Specification {
 
+  import models._
+
   "Application" should {
     "creacion tarea" in{
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
@@ -108,6 +110,64 @@ class ApplicationSpec extends Specification {
         contentAsString(ver) must contain("""[{"id":1,"label":"Pan","user_name":"anonimo","""
           +""""task_date":"NoData"},{"id":3,"label":"Pomelo","user_name":"anonimo","""
           +""""task_date":"NoData"}]""")
+      }
+    }
+    "error crear tarea a un usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+      
+        val tarea1 = route(FakeRequest.apply(POST, "/miguel/tasks")).get
+
+        status(tarea1) must equalTo(BAD_REQUEST)
+      }
+    }
+    "crear tarea a un usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        val usuario1 = controllers.Application.addTask("miguel")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "1", "label" -> "Kiwi"))
+
+        status(usuario1) must equalTo(CREATED)
+        contentAsString(usuario1) must contain("""Kiwi""")
+      }
+    }
+    "obtener tareas de un usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        val tarea1 = route(FakeRequest.apply(POST, "/pepe/tasks").withJsonBody(Json.obj(
+          "id" -> 1, "label" -> "Gel", "user_name" -> "pepe"))).get
+        val tarea2 = route(FakeRequest.apply(POST, "/pepe/tasks").withJsonBody(Json.obj(
+          "id" -> 2, "label" -> "Champu", "user_name" -> "pepe"))).get
+
+        val ver = route(FakeRequest.apply(GET, "/pepe/tasks")).get
+
+        status(ver) must equalTo(OK)
+        contentAsString(ver) must contain("""[{"id":1,"label":"Gel","user_name":"pepe","""
+          +""""task_date":"NoData"},{"id":2,"label":"Champu","user_name":"pepe","""
+          +""""task_date":"NoData"}]""")
+      }
+    }
+    "error tarea a un usuario inexistente" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        val tarea1 = route(FakeRequest.apply(POST, "/pepe/tasks").withJsonBody(Json.obj(
+          "id" -> 1, "label" -> "Gel", "user_name" -> "pepe"))).get
+        val tarea2 = route(FakeRequest.apply(POST, "/pepe/tasks").withJsonBody(Json.obj(
+          "id" -> 2, "label" -> "Champu", "user_name" -> "pepe"))).get
+
+        val usuario1 = route(FakeRequest.apply(GET, "/pepito/tasks")).get
+
+        status(usuario1) must equalTo(NOT_FOUND)
+        contentAsString(usuario1) must contain("Usuario no encontrado")
+      }
+    }
+    "error tarea porque usuario no existe" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        
+        val usuario1 = controllers.Application.addTask("pepito")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "1", "label" -> "Kiwi", "user_name"->"pepe"))
+
+        status(usuario1) must equalTo(NOT_FOUND)
+        contentAsString(usuario1) must contain("No podemos insertar tarea debido que no existe el Usuario")
       }
     }
   }   
