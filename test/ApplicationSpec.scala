@@ -2,13 +2,29 @@ package test
 
 import org.specs2.mutable._
 
+import play.api.libs.json._
 import play.api.test._  
 import play.api.test.Helpers._
 
 class ApplicationSpec extends Specification {
 
   "Application" should {
+    "creacion tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        val tarea1 = route(FakeRequest.apply(POST, "/tasks").withJsonBody(Json.obj(
+          "id" -> 1, "label" -> "Gel"))).get
+
+        status(tarea1) must equalTo(CREATED)
+      }
+    }
     "error creacion tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        val tarea1 = route(FakeRequest.apply(POST, "/tasks")).get
+
+        status(tarea1) must equalTo(BAD_REQUEST)
+      }
+    }
+    "error creacion tarea con usuario" in{
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
         val tarea1 = controllers.Application.addTask("anonimo")(FakeRequest())
 
@@ -16,7 +32,7 @@ class ApplicationSpec extends Specification {
 
       }
     }
-    "creacion de una tarea" in{
+    "creacion de una tarea con usuario" in{
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
         val tarea1 = controllers.Application.addTask("anonimo")(
