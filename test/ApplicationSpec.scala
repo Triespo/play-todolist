@@ -110,6 +110,24 @@ class ApplicationSpec extends Specification {
           +""""task_date":"NoData"}]""")
       }
     }
+    "error crear tarea a un usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+      
+        val tarea1 = route(FakeRequest.apply(POST, "/miguel/tasks")).get
+
+        status(tarea1) must equalTo(BAD_REQUEST)
+      }
+    }
+    "crear tarea a un usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        val usuario1 = controllers.Application.addTask("miguel")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "1", "label" -> "Kiwi"))
+
+        status(usuario1) must equalTo(CREATED)
+        contentAsString(usuario1) must contain("""Kiwi""")
+      }
+    }
   }   
 }
 
