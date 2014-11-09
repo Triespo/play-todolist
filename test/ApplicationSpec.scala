@@ -160,6 +160,16 @@ class ApplicationSpec extends Specification {
         contentAsString(usuario1) must contain("Usuario no encontrado")
       }
     }
+    "error tarea porque usuario no existe" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        
+        val usuario1 = controllers.Application.addTask("pepito")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "1", "label" -> "Kiwi", "user_name"->"pepe"))
+
+        status(usuario1) must equalTo(NOT_FOUND)
+        contentAsString(usuario1) must contain("No podemos insertar tarea debido que no existe el Usuario")
+      }
+    }
   }   
 }
 
