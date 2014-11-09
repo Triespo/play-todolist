@@ -61,6 +61,14 @@ object Task {
     }
   }
 
+  def createUser(user_name: String){
+    DB.withConnection { implicit c =>
+      SQL("insert into task_user(login) values ({user_name})").on(
+        'user_name -> user_name
+      ).executeUpdate()
+    }
+  }
+
   def all(user_name: String): List[Task] = DB.withConnection { implicit c =>
     SQL("select * from task where user_name = {user_name}").on('user_name -> user_name).as(task *)
   }

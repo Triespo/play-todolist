@@ -8,6 +8,8 @@ import play.api.test.Helpers._
 
 class ApplicationSpec extends Specification {
 
+  import models._
+
   "Application" should {
     "creacion tarea" in{
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
@@ -128,6 +130,41 @@ class ApplicationSpec extends Specification {
         contentAsString(usuario1) must contain("""Kiwi""")
       }
     }
+    "obtener tareas de un usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        /*val tarea1 = controllers.Application.addTask("pepito")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "1", "label" -> "Queso"))
+        val tarea2 = controllers.Application.addTask("pepito")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "2", "label" -> "Jarabe"))*/
+        //val ver = controllers.Application.userTasks("pepito")(FakeRequest())
+        /*val tarea1 = route(FakeRequest.apply(POST, "/pepito/tasks").withJsonBody(Json.obj(
+          "id" -> 1, "label" -> "Gel", "user_name" -> "pepito"))).get
+        val tarea2 = route(FakeRequest.apply(POST, "/pepito/tasks").withJsonBody(Json.obj(
+          "id" -> 2, "label" -> "Champu", "user_name" -> "pepito"))).get*/
+        Task.createUser("pepito")
+        Task.createInUser("pepito", "kiwi")
+        Task.createInUser("pepito", "aguacate")
+        val ver = route(FakeRequest.apply(GET, "/pepito/tasks")).get
+
+        status(ver) must equalTo(OK)
+        contentAsString(ver) must contain("""[{"id":1,"label":"kiwi","user_name":"pepito","""
+          +""""task_date":"NoData"},{"id":2,"label":"aguacate","user_name":"pepito","""
+          +""""task_date":"NoData"}]""")
+      }
+    }
+    /*"error tarea a un usuario inexistente" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        //Task.createUser("pepito")
+        Task.createUser("jose")
+        Task.createInUser("jose", "kiwi")
+
+        val usuario1 = route(FakeRequest.apply(POST, "/pepito/tasks")).get
+
+        status(usuario1) must equalTo(NOT_FOUND)
+      }
+    }*/
   }   
 }
 
