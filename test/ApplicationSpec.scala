@@ -83,6 +83,33 @@ class ApplicationSpec extends Specification {
           +""""task_date":"NoData"}]""")
       }      
     }
+    "borrar tarea que no existe" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        val result = route(FakeRequest.apply(DELETE, "/tasks/1")).get 
+
+        status(result) must equalTo(NOT_FOUND)
+        contentAsString(result) must contain("Error al borrar")
+      }
+    }
+    "borrar tarea que existe" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        val tarea1 = controllers.Application.addTask("anonimo")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "1", "label" -> "Pan"))
+        val tarea2 = controllers.Application.addTask("anonimo")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "2", "label" -> "Pera"))
+        val tarea3 = controllers.Application.addTask("anonimo")(
+          FakeRequest().withFormUrlEncodedBody("id" -> "3", "label" -> "Pomelo"))
+        val result = controllers.Application.deleteTask(2)(FakeRequest())
+        val ver = controllers.Application.tasks(FakeRequest())
+
+        status(result) must equalTo(OK)
+        contentAsString(result) must contain("Borrado")
+        contentAsString(ver) must contain("""[{"id":1,"label":"Pan","user_name":"anonimo","""
+          +""""task_date":"NoData"},{"id":3,"label":"Pomelo","user_name":"anonimo","""
+          +""""task_date":"NoData"}]""")
+      }
+    }
   }   
 }
 
