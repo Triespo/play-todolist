@@ -195,6 +195,38 @@ class ApplicationSpec extends Specification {
         contentAsString(fecha) must contain("No podemos guardar fecha, tarea no existe")
       }
     }
+    "obtener fecha de una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Correr"))
+        val fecha = route(FakeRequest.apply(POST, "/tasks/1/1997-03-08")).get
+        val consulta = route(FakeRequest.apply(GET, "/tasks/1/date")).get
+
+        status(consulta) must equalTo(OK)
+        contentAsString(consulta) must contain("1997-03-08")
+      }
+    }
+    "error obtener fecha de una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Nadar"))
+        val fecha = route(FakeRequest.apply(POST, "/tasks/1/1997-09-19")).get
+        val consulta = route(FakeRequest.apply(GET, "/tasks/2/date")).get
+
+        status(consulta) must equalTo(NOT_FOUND)
+        contentAsString(consulta) must contain("La tarea no existe")
+      }
+    }
+    "error2 obtener fecha de una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Rodar"))
+        val consulta = route(FakeRequest.apply(GET, "/tasks/1/date")).get
+
+        status(consulta) must equalTo(NOT_FOUND)
+        contentAsString(consulta) must contain("Fecha no encontrada")
+      }
+    }
   }   
 }
 
