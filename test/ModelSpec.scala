@@ -103,5 +103,23 @@ class ModelSpec extends Specification {
                 fechaInv must equalTo("1992-05-25")
             }
         }
+        "crear usuario y buscarlo" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                Task.createUser("federico")
+                val Some(usuario) = Task.findUser("federico")
+
+                usuario must equalTo("federico")
+            }
+        }
+        "buscar tarea" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                Task.create("Cotizar")
+                val Some(tarea) = Task.findTarea(1)
+
+                tarea must equalTo("Cotizar")
+            }
+        }
     }  
 }
