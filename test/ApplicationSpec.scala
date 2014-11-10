@@ -170,6 +170,20 @@ class ApplicationSpec extends Specification {
         contentAsString(usuario1) must contain("No podemos insertar tarea debido que no existe el Usuario")
       }
     }
+    "crear fecha a una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Pintura"))
+        val fecha = route(FakeRequest.apply(POST, "/tasks/1/1997-05-17")).get
+        val consult1 = controllers.Application.consultTask(1)(FakeRequest())
+
+        status(fecha) must equalTo(OK)
+        contentAsString(fecha) must contain("La fecha ha sido modificada")
+        contentAsString(consult1) must contain("""{"id":1,"label":"Pintura","user_name":"anonimo","""
+          +""""task_date":"1997-05-17"}""")
+      }
+    }
   }   
 }
 
