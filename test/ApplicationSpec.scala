@@ -65,7 +65,7 @@ class ApplicationSpec extends Specification {
 
         status(result) must equalTo(OK)
         contentAsString(result) must contain("""{"id":1,"label":"Goma","user_name":"anonimo","""
-          +""""task_date":"NoData"}""")
+          +""""task_date":"NoData","category":"descatalogado"}""")
       }
     }
     "listar tareas" in{
@@ -80,9 +80,9 @@ class ApplicationSpec extends Specification {
 
         status(result) must equalTo(OK)
         contentAsString(result) must contain("""[{"id":1,"label":"Goma","user_name":"anonimo","""
-          +""""task_date":"NoData"},{"id":2,"label":"Pan","user_name":"anonimo","""
-          +""""task_date":"NoData"},{"id":3,"label":"Leche","user_name":"anonimo","""
-          +""""task_date":"NoData"}]""")
+          +""""task_date":"NoData","category":"descatalogado"},{"id":2,"label":"Pan","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"},{"id":3,"label":"Leche","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
       }      
     }
     "borrar tarea que no existe" in{
@@ -108,8 +108,8 @@ class ApplicationSpec extends Specification {
         status(result) must equalTo(OK)
         contentAsString(result) must contain("Borrado")
         contentAsString(ver) must contain("""[{"id":1,"label":"Pan","user_name":"anonimo","""
-          +""""task_date":"NoData"},{"id":3,"label":"Pomelo","user_name":"anonimo","""
-          +""""task_date":"NoData"}]""")
+          +""""task_date":"NoData","category":"descatalogado"},{"id":3,"label":"Pomelo","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
       }
     }
     "error crear tarea a un usuario" in{
@@ -142,8 +142,8 @@ class ApplicationSpec extends Specification {
 
         status(ver) must equalTo(OK)
         contentAsString(ver) must contain("""[{"id":1,"label":"Gel","user_name":"pepe","""
-          +""""task_date":"NoData"},{"id":2,"label":"Champu","user_name":"pepe","""
-          +""""task_date":"NoData"}]""")
+          +""""task_date":"NoData","category":"descatalogado"},{"id":2,"label":"Champu","user_name":"pepe","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
       }
     }
     "error tarea a un usuario inexistente" in{
@@ -181,7 +181,7 @@ class ApplicationSpec extends Specification {
         status(fecha) must equalTo(OK)
         contentAsString(fecha) must contain("La fecha ha sido modificada")
         contentAsString(consult1) must contain("""{"id":1,"label":"Pintura","user_name":"anonimo","""
-          +""""task_date":"1997-05-17"}""")
+          +""""task_date":"1997-05-17","category":"descatalogado"}""")
       }
     }
     "error crear fecha a una tarea" in{
@@ -227,12 +227,128 @@ class ApplicationSpec extends Specification {
         contentAsString(consulta) must contain("Fecha no encontrada")
       }
     }
+    "registrar categoria de una tarea sin usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = route(FakeRequest.apply(POST, "/tasks/1/date/fruta")).get
+        val fruta2 = route(FakeRequest.apply(POST, "/tasks/2/date/fruta")).get
+        val ver = route(FakeRequest.apply(GET, "/tasks")).get
+
+        status(fruta1) must equalTo(OK)
+        status(fruta2) must equalTo(OK)
+        contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Papaya","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
+      }
+    }
+    "error registrar categoria de una tarea sin usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = route(FakeRequest.apply(POST, "/tasks/4/date/fruta")).get
+
+        status(fruta1) must equalTo(NOT_FOUND)
+        contentAsString(fruta1) must equalTo("No podemos guardar categoria, tarea no existe")
+      }
+    }
+    "registrar categoria de una tarea con usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = controllers.Application.addUserCategory(1,"miguel","fruta")(FakeRequest())
+        val fruta2 = controllers.Application.addUserCategory(2,"miguel","fruta")(FakeRequest())
+        val ver = route(FakeRequest.apply(GET, "/tasks")).get
+
+        status(fruta1) must equalTo(OK)
+        status(fruta2) must equalTo(OK)
+        contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Papaya","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
+      }
+    }
+    "error registrar categoria de una tarea con usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = route(FakeRequest.apply(POST, "/miguel/tasks/4/date/fruta")).get
+
+        status(fruta1) must equalTo(NOT_FOUND)
+        contentAsString(fruta1) must equalTo("No podemos guardar categoria en usuario, tarea no existe")
+      }
+    }
+    "listar tareas sin/con usuario en categoria" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Pineaple"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Brocoli"))
+
+        val completar1 = route(FakeRequest.apply(POST, "/miguel/tasks/1/date/fruta")).get
+        val completar2 = route(FakeRequest.apply(POST, "/miguel/tasks/2/date/fruta")).get
+        val completar3 = route(FakeRequest.apply(POST, "/tasks/3/date/hortaliza")).get
+        val ver = route(FakeRequest.apply(GET, "/tasks/date/fruta")).get
+        val ver2 = route(FakeRequest.apply(GET, "/anonimo/tasks/hortaliza")).get
+
+        status(ver) must equalTo(OK)
+        contentAsString(ver) must equalTo("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Pineaple","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"}]""")
+        status(ver2) must equalTo(OK)
+        contentAsString(ver2) must equalTo("""[{"id":3,"label":"Brocoli","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"hortaliza"}]""")
+      }
+    }
+    "errores tareas sin/con usuario en categoria" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Pineaple"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Brocoli"))
+
+        val completar1 = route(FakeRequest.apply(POST, "/miguel/tasks/4/date/fruta")).get
+        status(completar1) must equalTo(NOT_FOUND)
+        contentAsString(completar1) must equalTo("No podemos guardar categoria en usuario, tarea no existe")
+        val completar2 = route(FakeRequest.apply(POST, "/tasks/4/date/hortaliza")).get
+        status(completar2) must equalTo(NOT_FOUND)
+        contentAsString(completar2) must equalTo("No podemos guardar categoria, tarea no existe")
+        val ver = route(FakeRequest.apply(GET, "/tasks/date/fruta")).get
+        val ver2 = route(FakeRequest.apply(GET, "/juanito/tasks/hortaliza")).get
+        status(ver2) must equalTo(NOT_FOUND)
+        contentAsString(ver2) must equalTo("Usuario no encontrado con dicha categoria")
+      }
+    }
   }   
 }
-
-
-
-
-
-
-

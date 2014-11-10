@@ -24,5 +24,15 @@ POST     /:user/tasks            controllers.Application.addTask(user: String)
 GET      /tasks/:id/date        controllers.Application.getFecha(id: Int)
 POST     /tasks/:id/:date       controllers.Application.addFecha(id: Int, date: String)      
 
+# Asignar categorias tareas sin usuario
+
+GET      /tasks/date/:category           controllers.Application.getCategory(category: String)
+POST     /tasks/:id/date/:category  controllers.Application.addCategory(id: Int, category: String)
+
+# Asignar categorias tareas con usuario
+
+GET      /:user/tasks/:category      controllers.Application.getUserCategory(user: String, category: String)
+POST     /:user/tasks/:id/date/:category  controllers.Application.addUserCategory(id: Int, user: String, category: String)
+
 # Borrar una tarea
 DELETE   /tasks/:id              controllers.Application.deleteTask(id: Int)
