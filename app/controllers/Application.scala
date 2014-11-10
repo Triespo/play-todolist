@@ -170,4 +170,26 @@ object Application extends Controller {
     else
       NotFound("No podemos guardar categoria en usuario, tarea no existe")
   }
+
+  def getUserCategory(user: String, category: String) = Action{
+
+    val encontrado = Task.findUser(user)
+
+    if(encontrado != None){
+      if(encontrado.getOrElse(user) == user){
+        val json = Json.toJson(Task.getUserCategory(user, category))
+        Ok(json)
+      }
+      else
+        NotFound("Usuario con dicha categoria no existe")
+    }
+    else
+      NotFound("Usuario no encontrado con dicha categoria")
+  }
+
+  def getCategory(category: String) = Action{
+
+    val json = Json.toJson(Task.getCategory(category))
+    Ok(json)
+  }
 }

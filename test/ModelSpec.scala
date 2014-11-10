@@ -178,9 +178,9 @@ class ModelSpec extends Specification {
                 Task.create("Zanahoria")
                 Task.createUserCategory(1,"miguel","fruta")
                 Task.createUserCategory(2,"miguel","fruta")
-                Task.createUserCategory(3,"miguel","hortaliza")
+                Task.createCategory(3,"hortaliza")
                 val creado1 = Task.getUserCategory("anonimo","fruta")
-                val creado2 = Task.getUserCategory("anonimo","hortaliza")
+                val creado2 = Task.getCategory("hortaliza")
                 val pieza1 = creado1.head
                 val pieza2 = creado1.tail.head
                 val pieza3 = creado2.head

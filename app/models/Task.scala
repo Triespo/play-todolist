@@ -101,4 +101,13 @@ object Task {
     }
     value
   }
+
+  def getUserCategory(user: String, category: String): List[Task] = DB.withConnection{
+    implicit c => SQL("select * from task where user_name={user} and category={category}")
+    .on('user -> user, 'category -> category).as(task *)
+  }
+
+  def getCategory(category: String): List[Task] = DB.withConnection{
+    implicit c => SQL("select * from task where category={category}").on('category -> category).as(task *)
+  }
 }
