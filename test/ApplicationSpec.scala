@@ -170,6 +170,63 @@ class ApplicationSpec extends Specification {
         contentAsString(usuario1) must contain("No podemos insertar tarea debido que no existe el Usuario")
       }
     }
+    "crear fecha a una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Pintura"))
+        val fecha = route(FakeRequest.apply(POST, "/tasks/1/1997-05-17")).get
+        val consult1 = controllers.Application.consultTask(1)(FakeRequest())
+
+        status(fecha) must equalTo(OK)
+        contentAsString(fecha) must contain("La fecha ha sido modificada")
+        contentAsString(consult1) must contain("""{"id":1,"label":"Pintura","user_name":"anonimo","""
+          +""""task_date":"1997-05-17"}""")
+      }
+    }
+    "error crear fecha a una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papel"))
+        val fecha = route(FakeRequest.apply(POST, "/tasks/2/1997-05-24")).get
+
+        status(fecha) must equalTo(NOT_FOUND)
+        contentAsString(fecha) must contain("No podemos guardar fecha, tarea no existe")
+      }
+    }
+    "obtener fecha de una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Correr"))
+        val fecha = route(FakeRequest.apply(POST, "/tasks/1/1997-03-08")).get
+        val consulta = route(FakeRequest.apply(GET, "/tasks/1/date")).get
+
+        status(consulta) must equalTo(OK)
+        contentAsString(consulta) must contain("1997-03-08")
+      }
+    }
+    "error obtener fecha de una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Nadar"))
+        val fecha = route(FakeRequest.apply(POST, "/tasks/1/1997-09-19")).get
+        val consulta = route(FakeRequest.apply(GET, "/tasks/2/date")).get
+
+        status(consulta) must equalTo(NOT_FOUND)
+        contentAsString(consulta) must contain("La tarea no existe")
+      }
+    }
+    "error2 obtener fecha de una tarea" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Rodar"))
+        val consulta = route(FakeRequest.apply(GET, "/tasks/1/date")).get
+
+        status(consulta) must equalTo(NOT_FOUND)
+        contentAsString(consulta) must contain("Fecha no encontrada")
+      }
+    }
   }   
 }
 
