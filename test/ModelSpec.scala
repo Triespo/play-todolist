@@ -121,5 +121,23 @@ class ModelSpec extends Specification {
                 tarea must equalTo("Cotizar")
             }
         }
+        "registrar categoria de una tarea sin usuario modelo" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                Task.create("Naranja")
+                Task.create("Limon")
+                Task.create("Zanahoria")
+                Task.taskCategory(1,"fruta")
+                Task.taskCategory(2,"fruta")
+                val ver = Task.all()
+                val pieza1 = ver.head
+                val pieza2 = ver.tail.head
+                val pieza3 = ver.tail.tail.head
+
+                pieza1.category must equalTo("fruta")
+                pieza2.category must equalTo("fruta")
+                pieza3.category must equalTo("descatalogado")
+            }
+        }
     }  
 }

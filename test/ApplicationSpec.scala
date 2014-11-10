@@ -227,6 +227,26 @@ class ApplicationSpec extends Specification {
         contentAsString(consulta) must contain("Fecha no encontrada")
       }
     }
+    "registrar categoria de una tarea sin usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = route(FakeRequest.apply(POST, "/tasks/1/date/fruta")).get
+        val fruta2 = route(FakeRequest.apply(POST, "/tasks/2/date/fruta")).get
+        val ver = route(FakeRequest.apply(GET, "/tasks")).get
+
+        contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
+          +""""task_date":"NoData", "category":"fruta"},{"id":2,"label":"Papaya","user_name":"anonimo","""
+          +""""task_date":"NoData", "category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
+          +""""task_date":"NoData", "category":"descatalogado"}]""")
+      }
+    }
   }   
 }
 
