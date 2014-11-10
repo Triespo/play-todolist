@@ -8,7 +8,7 @@ CREATE TABLE task (
     label varchar(255)
 );
 CREATE TABLE task_user (
-   login varchar(25) NOT NULL,
+   login varchar(25),
    PRIMARY KEY(login)
 );
 
@@ -16,6 +16,8 @@ ALTER TABLE task ADD user_name varchar(25) DEFAULT 'anonimo';
 ALTER TABLE task ADD CONSTRAINT fk_task_taskUser FOREIGN KEY (user_name) REFERENCES task_user (login);
 # --- !Downs
 
+DELETE FROM task
+DELETE FROM task_user
 ALTER TABLE task DROP user_name;
 DROP TABLE IF EXISTS task_user;
 DROP TABLE IF EXISTS task;

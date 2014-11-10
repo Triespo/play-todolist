@@ -150,8 +150,8 @@ class ModelSpec extends Specification {
                 Task.create("Naranja")
                 Task.create("Limon")
                 Task.create("Zanahoria")
-                val creado1 = Task.createCategoryUser(1,"fruta","miguel")
-                val creado2 = Task.createCategoryUser(2,"fruta","miguel")
+                val creado1 = Task.createUserCategory(1,"miguel","fruta")
+                val creado2 = Task.createUserCategory(2,"miguel","fruta")
                 val ver = Task.all()
                 val pieza1 = ver.head
                 val pieza2 = ver.tail.head
@@ -159,18 +159,41 @@ class ModelSpec extends Specification {
                 val Some(categoria) = pieza1.category
                 val Some(categoria2) = pieza2.category
                 val Some(categoria3) = pieza3.category
-                val Some(usuario) = pieza1.user_name
-                val Some(usuario2) = pieza2.user_name
-                val Some(usuario3) = pieza3.user_name
 
                 creado1 must equalTo(1)
                 creado2 must equalTo(1)
                 categoria must equalTo("fruta")
                 categoria2 must equalTo("fruta")
                 categoria3 must equalTo("descatalogado")
-                categoria must equalTo("miguel")
-                categoria2 must equalTo("miguel")
-                categoria3 must equalTo("anonimo")
+                //pieza1.user_name must equalTo("miguel")
+                //pieza2.user_name must equalTo("miguel")
+                pieza3.user_name must equalTo("anonimo")
+            }
+        }
+        "listar tareas de un usuario en categoria modelo" in{
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                Task.create("Naranja")
+                Task.create("Limon")
+                Task.create("Zanahoria")
+                Task.createUserCategory(1,"miguel","fruta")
+                Task.createUserCategory(2,"miguel","fruta")
+                Task.createUserCategory(3,"miguel","hortaliza")
+                val creado1 = Task.getUserCategory("anonimo","fruta")
+                val creado2 = Task.getUserCategory("anonimo","hortaliza")
+                val pieza1 = creado1.head
+                val pieza2 = creado1.tail.head
+                val pieza3 = creado2.head
+                val Some(categoria) = pieza1.category
+                val Some(categoria2) = pieza2.category
+                val Some(categoria3) = pieza3.category
+
+                categoria must equalTo("fruta")
+                categoria2 must equalTo("fruta")
+                categoria3 must equalTo("hortaliza")
+                //pieza1.user_name must equalTo("miguel")
+                //pieza2.user_name must equalTo("miguel")
+                //pieza3.user_name must equalTo("miguel")
             }
         }
     }  

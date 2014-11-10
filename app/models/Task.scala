@@ -1,6 +1,6 @@
 package models
 
-import play.api.db._
+import play.api.db.DB
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
@@ -80,14 +80,24 @@ object Task {
 
   def createFecha(id: Int, fecha: Date): Int = { 
     val value:Int = DB.withConnection { 
-      implicit c => SQL("update task set task_date={fecha} where id={id}").on('fecha -> fecha, 'id -> id).executeUpdate()
+      implicit c => SQL("update task set task_date={fecha} where id={id}")
+      .on('fecha -> fecha, 'id -> id).executeUpdate()
     }
     value
   }
 
   def createCategory(id: Int, category: String): Int = {
     val value:Int = DB.withConnection {
-      implicit c => SQL("update task set category={category} where id={id}").on('category -> category, 'id -> id).executeUpdate()
+      implicit c => SQL("update task set category={category} where id={id}")
+      .on('category -> category, 'id -> id).executeUpdate()
+    }
+    value
+  }
+
+  def createUserCategory(id: Int, user: String, category: String): Int = {
+    val value:Int = DB.withConnection {
+      implicit c => SQL("update task set category={category} where id={id}")
+      .on('category -> category,'user_name ->user, 'id -> id).executeUpdate()
     }
     value
   }

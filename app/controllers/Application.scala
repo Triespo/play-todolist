@@ -154,4 +154,20 @@ object Application extends Controller {
     else
       NotFound("No podemos guardar categoria, tarea no existe")
   }
+
+  def addUserCategory(id: Int, user: String, category: String) = Action{
+
+    val tarea = Task.findTarea(id)
+
+    if(tarea != None){
+
+      if(Task.createUserCategory(id,user,category) > 0){
+        Ok("La categoria si ha sido modificada")
+      }
+      else
+        NotFound("No hemos guardado bien la categoria del usuario") 
+    }
+    else
+      NotFound("No podemos guardar categoria en usuario, tarea no existe")
+  }
 }

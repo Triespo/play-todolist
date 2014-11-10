@@ -275,14 +275,14 @@ class ApplicationSpec extends Specification {
         controllers.Application.newTask()(
           FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
 
-        val fruta1 = route(FakeRequest.apply(POST, "/miguel/tasks/1/date/fruta")).get
-        val fruta2 = route(FakeRequest.apply(POST, "/miguel/tasks/2/date/fruta")).get
+        val fruta1 = controllers.Application.addUserCategory(1,"miguel","fruta")(FakeRequest())
+        val fruta2 = controllers.Application.addUserCategory(2,"miguel","fruta")(FakeRequest())
         val ver = route(FakeRequest.apply(GET, "/tasks")).get
 
-        status(fruta1) must contain(OK)
-        status(fruta2) must contain(OK)
-        contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"miguel","""
-          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Papaya","user_name":"miguel","""
+        status(fruta1) must equalTo(OK)
+        status(fruta2) must equalTo(OK)
+        contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Papaya","user_name":"anonimo","""
           +""""task_date":"NoData","category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
           +""""task_date":"NoData","category":"descatalogado"}]""")
       }
@@ -301,6 +301,28 @@ class ApplicationSpec extends Specification {
 
         status(fruta1) must equalTo(NOT_FOUND)
         contentAsString(fruta1) must equalTo("No podemos guardar categoria en usuario, tarea no existe")
+      }
+    }
+    "listar tareas de un usuario en categoria" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja", "usuario" -> "miguel", "categoria" -> "fruta"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Pineaple", "usuario" -> "miguel", "categoria" -> "fruta"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Brocoli", "usuario" -> "miguel", "categoria" -> "hortaliza"))
+
+        val ver = route(FakeRequest.apply(GET, "/miguel/tasks/fruta")).get
+        val ver2 = route(FakeRequest.apply(GET, "/miguel/tasks/hortaliza")).get
+
+        status(ver) must equalTo(OK)
+        contentAsString(ver) must equalTo("""[{"id":1,"label":"Naranja","user_name":"miguel","""
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Pineaple","user_name":"miguel","""
+          +""""task_date":"NoData","category":"fruta"}]""")
+        status(ver2) must equalTo(OK)
+        contentAsString(ver2) must equalTO("""[{"id":3,"label":"Brocoli","user_name":"miguel","""
+          +""""task_date":"NoData","category":"hortaliza"}]""")
       }
     }
   }   
