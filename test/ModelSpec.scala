@@ -144,5 +144,34 @@ class ModelSpec extends Specification {
                 categoria3 must equalTo("descatalogado")
             }
         }
+        "registrar categoria de una tarea con usuario modelo" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                Task.create("Naranja")
+                Task.create("Limon")
+                Task.create("Zanahoria")
+                val creado1 = Task.createCategoryUser(1,"fruta","miguel")
+                val creado2 = Task.createCategoryUser(2,"fruta","miguel")
+                val ver = Task.all()
+                val pieza1 = ver.head
+                val pieza2 = ver.tail.head
+                val pieza3 = ver.tail.tail.head
+                val Some(categoria) = pieza1.category
+                val Some(categoria2) = pieza2.category
+                val Some(categoria3) = pieza3.category
+                val Some(usuario) = pieza1.user_name
+                val Some(usuario2) = pieza2.user_name
+                val Some(usuario3) = pieza3.user_name
+
+                creado1 must equalTo(1)
+                creado2 must equalTo(1)
+                categoria must equalTo("fruta")
+                categoria2 must equalTo("fruta")
+                categoria3 must equalTo("descatalogado")
+                categoria must equalTo("miguel")
+                categoria2 must equalTo("miguel")
+                categoria3 must equalTo("anonimo")
+            }
+        }
     }  
 }

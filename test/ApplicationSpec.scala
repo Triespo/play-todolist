@@ -241,6 +241,8 @@ class ApplicationSpec extends Specification {
         val fruta2 = route(FakeRequest.apply(POST, "/tasks/2/date/fruta")).get
         val ver = route(FakeRequest.apply(GET, "/tasks")).get
 
+        status(fruta1) must equalTo(OK)
+        status(fruta2) must equalTo(OK)
         contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
           +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Papaya","user_name":"anonimo","""
           +""""task_date":"NoData","category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
@@ -263,12 +265,43 @@ class ApplicationSpec extends Specification {
         contentAsString(fruta1) must equalTo("No podemos guardar categoria, tarea no existe")
       }
     }
+    "registrar categoria de una tarea con usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = route(FakeRequest.apply(POST, "/miguel/tasks/1/date/fruta")).get
+        val fruta2 = route(FakeRequest.apply(POST, "/miguel/tasks/2/date/fruta")).get
+        val ver = route(FakeRequest.apply(GET, "/tasks")).get
+
+        status(fruta1) must contain(OK)
+        status(fruta2) must contain(OK)
+        contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"miguel","""
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Papaya","user_name":"miguel","""
+          +""""task_date":"NoData","category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
+      }
+    }
+    "error registrar categoria de una tarea con usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = route(FakeRequest.apply(POST, "/miguel/tasks/4/date/fruta")).get
+
+        status(fruta1) must equalTo(NOT_FOUND)
+        contentAsString(fruta1) must equalTo("No podemos guardar categoria en usuario, tarea no existe")
+      }
+    }
   }   
 }
-
-
-
-
-
-
-
