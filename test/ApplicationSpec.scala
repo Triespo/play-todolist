@@ -247,6 +247,22 @@ class ApplicationSpec extends Specification {
           +""""task_date":"NoData","category":"descatalogado"}]""")
       }
     }
+    "error registrar categoria de una tarea sin usuario" in{
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Naranja"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Papaya"))
+        controllers.Application.newTask()(
+          FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
+
+        val fruta1 = route(FakeRequest.apply(POST, "/tasks/4/date/fruta")).get
+
+        status(fruta1) must equalTo(NOT_FOUND)
+        contentAsString(fruta1) must equalTo("No podemos guardar categoria, tarea no existe")
+      }
+    }
   }   
 }
 
