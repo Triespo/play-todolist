@@ -8,7 +8,7 @@ class ModelSpec extends Specification {
 
     import models._
 
-    def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str  
+    //def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str  
     def strToDate(str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").parse(str)
 
     "Models" should {
@@ -76,6 +76,16 @@ class ModelSpec extends Specification {
 
                 task1.label must equalTo("agua")
                 task2.label must equalTo("vino")
+            }
+        }
+        "crear fecha tarea" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                val fecha = strToDate("24-05-1992")
+                Task.create("Vodka")
+                val crear = Task.createFecha(1, fecha)
+
+                crear must equalTo(1)
             }
         }
     }  
