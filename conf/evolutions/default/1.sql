@@ -14,7 +14,6 @@ CREATE TABLE task_user (
 
 ALTER TABLE task ADD user_name varchar(25) DEFAULT 'anonimo';
 ALTER TABLE task ADD CONSTRAINT fk_task_taskUser FOREIGN KEY (user_name) REFERENCES task_user (login);
-
 # --- !Downs
 
 ALTER TABLE task DROP user_name;

@@ -65,7 +65,7 @@ class ApplicationSpec extends Specification {
 
         status(result) must equalTo(OK)
         contentAsString(result) must contain("""{"id":1,"label":"Goma","user_name":"anonimo","""
-          +""""task_date":"NoData"}""")
+          +""""task_date":"NoData","category":"descatalogado"}""")
       }
     }
     "listar tareas" in{
@@ -80,9 +80,9 @@ class ApplicationSpec extends Specification {
 
         status(result) must equalTo(OK)
         contentAsString(result) must contain("""[{"id":1,"label":"Goma","user_name":"anonimo","""
-          +""""task_date":"NoData"},{"id":2,"label":"Pan","user_name":"anonimo","""
-          +""""task_date":"NoData"},{"id":3,"label":"Leche","user_name":"anonimo","""
-          +""""task_date":"NoData"}]""")
+          +""""task_date":"NoData","category":"descatalogado"},{"id":2,"label":"Pan","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"},{"id":3,"label":"Leche","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
       }      
     }
     "borrar tarea que no existe" in{
@@ -108,8 +108,8 @@ class ApplicationSpec extends Specification {
         status(result) must equalTo(OK)
         contentAsString(result) must contain("Borrado")
         contentAsString(ver) must contain("""[{"id":1,"label":"Pan","user_name":"anonimo","""
-          +""""task_date":"NoData"},{"id":3,"label":"Pomelo","user_name":"anonimo","""
-          +""""task_date":"NoData"}]""")
+          +""""task_date":"NoData","category":"descatalogado"},{"id":3,"label":"Pomelo","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
       }
     }
     "error crear tarea a un usuario" in{
@@ -142,8 +142,8 @@ class ApplicationSpec extends Specification {
 
         status(ver) must equalTo(OK)
         contentAsString(ver) must contain("""[{"id":1,"label":"Gel","user_name":"pepe","""
-          +""""task_date":"NoData"},{"id":2,"label":"Champu","user_name":"pepe","""
-          +""""task_date":"NoData"}]""")
+          +""""task_date":"NoData","category":"descatalogado"},{"id":2,"label":"Champu","user_name":"pepe","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
       }
     }
     "error tarea a un usuario inexistente" in{
@@ -181,7 +181,7 @@ class ApplicationSpec extends Specification {
         status(fecha) must equalTo(OK)
         contentAsString(fecha) must contain("La fecha ha sido modificada")
         contentAsString(consult1) must contain("""{"id":1,"label":"Pintura","user_name":"anonimo","""
-          +""""task_date":"1997-05-17"}""")
+          +""""task_date":"1997-05-17","category":"descatalogado"}""")
       }
     }
     "error crear fecha a una tarea" in{
@@ -242,9 +242,9 @@ class ApplicationSpec extends Specification {
         val ver = route(FakeRequest.apply(GET, "/tasks")).get
 
         contentAsString(ver) must contain("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
-          +""""task_date":"NoData", "category":"fruta"},{"id":2,"label":"Papaya","user_name":"anonimo","""
-          +""""task_date":"NoData", "category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
-          +""""task_date":"NoData", "category":"descatalogado"}]""")
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Papaya","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"fruta"},{"id":3,"label":"Calabaza","user_name":"anonimo","""
+          +""""task_date":"NoData","category":"descatalogado"}]""")
       }
     }
   }   

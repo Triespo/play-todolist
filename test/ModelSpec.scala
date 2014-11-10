@@ -127,16 +127,21 @@ class ModelSpec extends Specification {
                 Task.create("Naranja")
                 Task.create("Limon")
                 Task.create("Zanahoria")
-                Task.taskCategory(1,"fruta")
-                Task.taskCategory(2,"fruta")
+                val creado1 = Task.createCategory(1,"fruta")
+                val creado2 = Task.createCategory(2,"fruta")
                 val ver = Task.all()
                 val pieza1 = ver.head
                 val pieza2 = ver.tail.head
                 val pieza3 = ver.tail.tail.head
+                val Some(categoria) = pieza1.category
+                val Some(categoria2) = pieza2.category
+                val Some(categoria3) = pieza3.category
 
-                pieza1.category must equalTo("fruta")
-                pieza2.category must equalTo("fruta")
-                pieza3.category must equalTo("descatalogado")
+                creado1 must equalTo(1)
+                creado2 must equalTo(1)
+                categoria must equalTo("fruta")
+                categoria2 must equalTo("fruta")
+                categoria3 must equalTo("descatalogado")
             }
         }
     }  

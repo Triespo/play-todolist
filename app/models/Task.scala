@@ -6,7 +6,7 @@ import anorm._
 import anorm.SqlParser._
 import java.util.Date
 
-case class Task(id: Int, label: String, user_name: String, task_date: Option[Date])
+case class Task(id: Int, label: String, user_name: String, task_date: Option[Date], category: Option[String])
 
 object Task {
   
@@ -14,8 +14,9 @@ object Task {
     get[Int]("id") ~ 
     get[String]("label") ~
     get[String]("user_name") ~
-    get[Option[Date]]("task_date") map {
-     case id~label~user_name~task_date => Task(id, label, user_name,task_date)
+    get[Option[Date]]("task_date") ~
+    get[Option[String]]("category") map {
+     case id~label~user_name~task_date~category => Task(id, label, user_name,task_date,category)
     }
   }
 
@@ -79,7 +80,14 @@ object Task {
 
   def createFecha(id: Int, fecha: Date): Int = { 
     val value:Int = DB.withConnection { 
-    implicit c => SQL("update task set task_date={fecha} where id={id}").on('fecha -> fecha, 'id -> id).executeUpdate()
+      implicit c => SQL("update task set task_date={fecha} where id={id}").on('fecha -> fecha, 'id -> id).executeUpdate()
+    }
+    value
+  }
+
+  def createCategory(id: Int, category: String): Int = {
+    val value:Int = DB.withConnection {
+      implicit c => SQL("update task set category={category} where id={id}").on('category -> category, 'id -> id).executeUpdate()
     }
     value
   }

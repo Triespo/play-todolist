@@ -24,6 +24,12 @@ object Application extends Controller {
         formato.format(data.getOrElse(data))
       else
         "NoData"
+    ) and
+    (JsPath \ "category").write[String].contramap[Option[String]](cat =>
+      if(cat != None)
+        cat.getOrElse("")
+      else
+        "descatalogado"
     )
   )(unlift(Task.unapply))
 
@@ -131,5 +137,21 @@ object Application extends Controller {
     }
     else
       NotFound("No podemos guardar fecha, tarea no existe")
+  }
+
+  def addCategory(id: Int, category: String) = Action{
+
+    val tarea = Task.findTarea(id)
+
+    if(tarea != None){
+
+      if(Task.createCategory(id,category) > 0){
+        Ok("La categoria ha sido modificada")
+      }
+      else
+        NotFound("No hemos guardado bien la categoria") 
+    }
+    else
+      NotFound("No podemos guardar categoria, tarea no existe")
   }
 }
