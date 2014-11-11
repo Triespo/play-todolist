@@ -275,8 +275,8 @@ class ApplicationSpec extends Specification {
         controllers.Application.newTask()(
           FakeRequest().withFormUrlEncodedBody("label" -> "Calabaza"))
 
-        val fruta1 = controllers.Application.addUserCategory(1,"miguel","fruta")(FakeRequest())
-        val fruta2 = controllers.Application.addUserCategory(2,"miguel","fruta")(FakeRequest())
+        val fruta1 = controllers.Application.addUserCategory(1,"anonimo","fruta")(FakeRequest())
+        val fruta2 = controllers.Application.addUserCategory(2,"anonimo","fruta")(FakeRequest())
         val ver = route(FakeRequest.apply(GET, "/tasks")).get
 
         status(fruta1) must equalTo(OK)
@@ -320,8 +320,8 @@ class ApplicationSpec extends Specification {
         val ver2 = route(FakeRequest.apply(GET, "/anonimo/tasks/hortaliza")).get
 
         status(ver) must equalTo(OK)
-        contentAsString(ver) must equalTo("""[{"id":1,"label":"Naranja","user_name":"anonimo","""
-          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Pineaple","user_name":"anonimo","""
+        contentAsString(ver) must equalTo("""[{"id":1,"label":"Naranja","user_name":"miguel","""
+          +""""task_date":"NoData","category":"fruta"},{"id":2,"label":"Pineaple","user_name":"miguel","""
           +""""task_date":"NoData","category":"fruta"}]""")
         status(ver2) must equalTo(OK)
         contentAsString(ver2) must equalTo("""[{"id":3,"label":"Brocoli","user_name":"anonimo","""

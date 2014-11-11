@@ -96,8 +96,8 @@ object Task {
 
   def createUserCategory(id: Int, user: String, category: String): Int = {
     val value:Int = DB.withConnection {
-      implicit c => SQL("update task set category={category} where id={id}")
-      .on('category -> category,'user_name ->user, 'id -> id).executeUpdate()
+      implicit c => SQL("update task set category={category},user_name={user} where id={id}")
+      .on('category -> category,'user ->user, 'id -> id).executeUpdate()
     }
     value
   }

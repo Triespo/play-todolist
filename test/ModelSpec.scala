@@ -112,6 +112,14 @@ class ModelSpec extends Specification {
                 usuario must equalTo("federico")
             }
         }
+        "buscar usuario creado" in {
+            running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
+
+                val Some(usuario) = Task.findUser("miguel")
+
+                usuario must equalTo("miguel")
+            }
+        }
         "buscar tarea" in {
             running(FakeApplication(additionalConfiguration = inMemoryDatabase())){
 
@@ -150,8 +158,8 @@ class ModelSpec extends Specification {
                 Task.create("Naranja")
                 Task.create("Limon")
                 Task.create("Zanahoria")
-                val creado1 = Task.createUserCategory(1,"miguel","fruta")
-                val creado2 = Task.createUserCategory(2,"miguel","fruta")
+                val creado1 = Task.createUserCategory(1,"anonimo","fruta")
+                val creado2 = Task.createUserCategory(2,"anonimo","fruta")
                 val ver = Task.all()
                 val pieza1 = ver.head
                 val pieza2 = ver.tail.head
@@ -165,8 +173,8 @@ class ModelSpec extends Specification {
                 categoria must equalTo("fruta")
                 categoria2 must equalTo("fruta")
                 categoria3 must equalTo("descatalogado")
-                //pieza1.user_name must equalTo("miguel")
-                //pieza2.user_name must equalTo("miguel")
+                pieza1.user_name must equalTo("anonimo")
+                pieza2.user_name must equalTo("anonimo")
                 pieza3.user_name must equalTo("anonimo")
             }
         }
@@ -176,8 +184,8 @@ class ModelSpec extends Specification {
                 Task.create("Naranja")
                 Task.create("Limon")
                 Task.create("Zanahoria")
-                Task.createUserCategory(1,"miguel","fruta")
-                Task.createUserCategory(2,"miguel","fruta")
+                Task.createUserCategory(1,"anonimo","fruta")
+                Task.createUserCategory(2,"anonimo","fruta")
                 Task.createCategory(3,"hortaliza")
                 val creado1 = Task.getUserCategory("anonimo","fruta")
                 val creado2 = Task.getCategory("hortaliza")
@@ -191,9 +199,9 @@ class ModelSpec extends Specification {
                 categoria must equalTo("fruta")
                 categoria2 must equalTo("fruta")
                 categoria3 must equalTo("hortaliza")
-                //pieza1.user_name must equalTo("miguel")
-                //pieza2.user_name must equalTo("miguel")
-                //pieza3.user_name must equalTo("miguel")
+                pieza1.user_name must equalTo("anonimo")
+                pieza2.user_name must equalTo("anonimo")
+                pieza3.user_name must equalTo("anonimo")
             }
         }
     }  
