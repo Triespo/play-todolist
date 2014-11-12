@@ -7,7 +7,8 @@ CREATE SEQUENCE categoria_id_seq;
 
 CREATE TABLE categoria(
    id integer NOT NULL DEFAULT nextval('categoria_id_seq'),
-   name varchar(25),
+   name varchar(25) NOT NULL,
+   CONSTRAINT uk_name UNIQUE(name),
    PRIMARY KEY (id)
 );
 
@@ -28,4 +29,7 @@ INSERT INTO categoria(name) VALUES ('hortaliza');
 
 DELETE FROM categoria;
 ALTER TABLE task DROP category;
+ALTER TABLE task_user DROP category;
+ALTER TABLE categoria DROP user_name;
 DROP TABLE IF EXIST categoria;
+DROP SEQUENCE categoria_id_seq;

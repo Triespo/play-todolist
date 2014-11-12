@@ -6,11 +6,13 @@ CREATE SEQUENCE task_id_seq;
 CREATE SEQUENCE task_user_id_seq;
 CREATE TABLE task (
     id integer NOT NULL DEFAULT nextval('task_id_seq'),
-    label varchar(255)
+    label varchar(255),
+    PRIMARY KEY(id)
 );
 CREATE TABLE task_user (
    id integer NOT NULL DEFAULT nextval('task_user_id_seq'),
-   login varchar(25),
+   login varchar(25) NOT NULL,
+   CONSTRAINT uk_login UNIQUE(login),
    PRIMARY KEY(id)
 );
 

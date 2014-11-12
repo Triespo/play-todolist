@@ -54,3 +54,6 @@ CAMBIOS EN LA BASE DE DATOS
 
 La relacion que he hecho es de 3 tablas (task, task_user, categoria) en las cuales las 3 se relacionan entre si,
 con cada una con su respectiva id que se ira incrementando gracias a la secuencia especifica que se crea.
+
+NOTA: Hay una prueba especifica en fecha que raramente falla la primera vez que se le pasan los test pero luego 
+al volver a pasarlos si que la pasa.
